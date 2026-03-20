@@ -110,13 +110,17 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="filtro-group">
-                                        <label><i class="fas fa-tags"></i> Assunto</label>
-                                        <select name="assunto_id" class="form-control form-control-custom">
-                                            <option value="">Todos</option>
-                                            {% for assunto in assuntos %}
-                                            <option value="{{ assunto.id_assunto }}" {% if filtros.get('assunto_id')|string == assunto.id_local|string %}selected{% endif %}>{{ assunto.nome_assunto }}</option>
-                                            {% endfor %}
-                                        </select>
+                                        <label for="assunto"><i class="fas fa-tags"></i> Assunto</label>
+                                        <input type="text" 
+                                            class="form-control form-control-custom" 
+                                            id="assunto" 
+                                            name="assunto" 
+                                            value="{{ filtros.get('assunto', '') }}"
+                                            placeholder="Digite palavras do assunto..."
+                                            aria-label="Busca por assunto">
+                                        <small class="text-muted mt-1 d-block">
+                                            <i class="fas fa-info-circle"></i> Busca inteligente (ex: "arquitetura", "engenharia civil")
+                                        </small>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -203,10 +207,12 @@
                                         <input type="text" class="form-control form-control-custom" name="setor_mapa" value="{{ request.args.setor_mapa }}" placeholder="Setor">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                               <div class="col-md-4">
                                     <div class="filtro-group">
                                         <label><i class="fas fa-tags"></i> Assunto (texto)</label>
-                                        <input type="text" class="form-control form-control-custom" name="assunto_mapa" value="{{ request.args.assunto_mapa }}" placeholder="Assunto">
+                                        <input type="text" class="form-control form-control-custom" 
+                                            name="assunto" 
+                                            value="{{ filtros.get('assunto', '') }}"  placeholder="Assunto">
                                     </div>
                                 </div>
 

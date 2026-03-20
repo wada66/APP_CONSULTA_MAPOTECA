@@ -147,6 +147,7 @@ def listar():
         request.args.get('local_id'),
         request.args.get('setor_id'),
         request.args.get('assunto_id'),
+        request.args.get('assunto'),
         request.args.get('mes'),
         request.args.get('ano'),
         request.args.get('conteudo'),
@@ -261,13 +262,32 @@ def listar():
                     filtros['setor_id'] = request.args['setor_id']
                 except: pass
 
-            # Assunto (FK)
+            # Assunto - busca textual (para livros)
+            if 'assunto' in request.args and request.args['assunto']:
+                termo = request.args['assunto'].strip()
+                if termo:
+                    palavras = termo.split()
+                    condicoes = []
+                    for palavra in palavras:
+                        if len(palavra) >= 2:
+                            padrao = criar_padrao_regex(palavra)
+                            try:
+                                condicoes.append(models['assunto'].nome_assunto.op('~*')(padrao))
+                            except:
+                                condicoes.append(models['assunto'].nome_assunto.ilike(f"%{palavra}%"))
+                        else:
+                            condicoes.append(models['assunto'].nome_assunto.ilike(f"%{palavra}%"))
+                    if condicoes:
+                        query = query.join(models['assunto'], Principal.id_assunto == models['assunto'].id_assunto).filter(*condicoes)
+                    filtros['assunto'] = termo
+
+            # Assunto (FK) - mantido para compatibilidade
             if 'assunto_id' in request.args and request.args['assunto_id']:
                 try:
                     query = query.filter(Principal.id_assunto == int(request.args['assunto_id']))
                     filtros['assunto_id'] = request.args['assunto_id']
                 except: pass
-
+                    
             # Executor
             if 'executor' in request.args and request.args['executor']:
                 termo = request.args['executor'].strip()
@@ -397,9 +417,36 @@ def listar():
             if 'setor_mapa' in request.args and request.args['setor_mapa']:
                 query = query.filter(Principal.setor_mapa.ilike(f"%{request.args['setor_mapa']}%"))
                 filtros['setor_mapa'] = request.args['setor_mapa']
-            if 'assunto_mapa' in request.args and request.args['assunto_mapa']:
-                query = query.filter(Principal.assunto_mapa.ilike(f"%{request.args['assunto_mapa']}%"))
-                filtros['assunto_mapa'] = request.args['assunto_mapa']
+                
+            # Campos específicos de mapa
+            if 'escala' in request.args and request.args['escala']:
+                query = query.filter(Principal.escala_mapa.ilike(f"%{request.args['escala']}%"))
+                filtros['escala'] = request.args['escala']
+                print(f"DEBUG - Escala: {request.args['escala']}")
+            
+            # Assunto (texto livre para mapas)
+            if 'assunto' in request.args and request.args['assunto']:
+                termo = request.args['assunto'].strip()
+                print(f"DEBUG - Assunto recebido: {termo}")  # Verifica se recebeu o parâmetro
+                if termo:
+                    palavras = termo.split()
+                    condicoes = []
+                    for palavra in palavras:
+                        if len(palavra) >= 2:
+                            padrao = criar_padrao_regex(palavra)
+                            try:
+                                condicao = Principal.assunto_mapa.op('~*')(padrao)
+                                condicoes.append(condicao)
+                                print(f"DEBUG - Condição regex: {padrao}")
+                            except Exception as e:
+                                print(f"DEBUG - Erro regex: {e}")
+                                condicoes.append(Principal.assunto_mapa.ilike(f"%{palavra}%"))
+                        else:
+                            condicoes.append(Principal.assunto_mapa.ilike(f"%{palavra}%"))
+                    if condicoes:
+                        query = query.filter(*condicoes)
+                        print(f"DEBUG - Query com {len(condicoes)} condições")
+                    filtros['assunto'] = termo
 
         elif schema == 'projar':
             # Autor
