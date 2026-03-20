@@ -225,18 +225,7 @@
                                         <input type="text" class="form-control form-control-custom" name="projecao" value="{{ request.args.projecao }}" placeholder="Ex: UTM">
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="filtro-group">
-                                        <label><i class="fas fa-link"></i> Articulação</label>
-                                        <input type="text" class="form-control form-control-custom" name="articulacao" value="{{ request.args.articulacao }}" placeholder="Articulação">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="filtro-group">
-                                        <label><i class="fas fa-building"></i> Setor (texto)</label>
-                                        <input type="text" class="form-control form-control-custom" name="setor_mapa" value="{{ request.args.setor_mapa }}" placeholder="Setor">
-                                    </div>
-                                </div>
+                                
                                <div class="col-md-4">
                                     <div class="filtro-group">
                                         <label><i class="fas fa-tags"></i> Assunto (texto)</label>
@@ -311,18 +300,6 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="filtro-group">
-                                        <label><i class="fas fa-ruler"></i> Escala</label>
-                                        <input type="text" class="form-control form-control-custom" name="escala" value="{{ request.args.escala }}" placeholder="Escala">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="filtro-group">
-                                        <label><i class="fas fa-copy"></i> Outras versões</label>
-                                        <input type="text" class="form-control form-control-custom" name="outras_versoes" value="{{ request.args.outras_versoes }}" placeholder="Outras versões">
-                                    </div>
-                                </div>
 
                             {% elif schema == 'projen' %}
                                 <!-- Filtros projen (sem escala/versoes) -->
@@ -338,28 +315,7 @@
                                         <input type="text" class="form-control form-control-custom" name="executor" value="{{ request.args.executor }}" placeholder="Nome do executor">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="filtro-group">
-                                        <label><i class="fas fa-map-marker-alt"></i> Local</label>
-                                        <select name="local_id" class="form-control form-control-custom">
-                                            <option value="">Todos</option>
-                                            {% for local in locais %}
-                                            <option value="{{ local.id_local }}" {% if filtros.get('local_id')|string == local.id_local|string %}selected{% endif %}>{{ local.nome_local }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="filtro-group">
-                                        <label><i class="fas fa-building"></i> Setor</label>
-                                        <select name="setor_id" class="form-control form-control-custom">
-                                            <option value="">Todos</option>
-                                            {% for setor in setores %}
-                                            <option value="{{ setor.id_setor }}" {% if filtros.get('setor_id')|string == setor.id_setor|string %}selected{% endif %}>{{ setor.nome_setor }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
+                    
                                 <div class="col-md-4">
                                     <div class="filtro-group">
                                         <label><i class="fas fa-tags"></i> Assunto</label>
