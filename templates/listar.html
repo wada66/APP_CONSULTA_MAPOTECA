@@ -62,14 +62,44 @@
                                 </div>
                             </div>
 
-                            <!-- Data (comum) -->
+                            <!-- Data - Único campo de ano para todos os schemas -->
                             <div class="col-md-3">
                                 <div class="filtro-group">
-                                    <label><i class="fas fa-calendar-alt"></i> Data</label>
-                                    <input type="date" class="form-control form-control-custom" name="data" value="{{ request.args.data }}">
+                                    <label><i class="fas fa-calendar-alt"></i> Ano</label>
+                                    <input type="number" class="form-control form-control-custom" 
+                                        name="ano" 
+                                        value="{{ filtros.get('ano', '') }}" 
+                                        placeholder="AAAA"
+                                        min="1900"
+                                        max="2100">
+                                    <small class="text-muted">Digite o ano para filtrar</small>
                                 </div>
                             </div>
 
+                            <!-- Para Projen - Mês opcional -->
+                            {% if schema == 'projen' %}
+                            <div class="col-md-3">
+                                <div class="filtro-group">
+                                    <label><i class="fas fa-calendar-alt"></i> Mês</label>
+                                    <select name="mes" class="form-control form-control-custom">
+                                        <option value="">Todos</option>
+                                        <option value="1" {% if filtros.get('mes') == '1' %}selected{% endif %}>Janeiro</option>
+                                        <option value="2" {% if filtros.get('mes') == '2' %}selected{% endif %}>Fevereiro</option>
+                                        <option value="3" {% if filtros.get('mes') == '3' %}selected{% endif %}>Março</option>
+                                        <option value="4" {% if filtros.get('mes') == '4' %}selected{% endif %}>Abril</option>
+                                        <option value="5" {% if filtros.get('mes') == '5' %}selected{% endif %}>Maio</option>
+                                        <option value="6" {% if filtros.get('mes') == '6' %}selected{% endif %}>Junho</option>
+                                        <option value="7" {% if filtros.get('mes') == '7' %}selected{% endif %}>Julho</option>
+                                        <option value="8" {% if filtros.get('mes') == '8' %}selected{% endif %}>Agosto</option>
+                                        <option value="9" {% if filtros.get('mes') == '9' %}selected{% endif %}>Setembro</option>
+                                        <option value="10" {% if filtros.get('mes') == '10' %}selected{% endif %}>Outubro</option>
+                                        <option value="11" {% if filtros.get('mes') == '11' %}selected{% endif %}>Novembro</option>
+                                        <option value="12" {% if filtros.get('mes') == '12' %}selected{% endif %}>Dezembro</option>
+                                    </select>
+                                    <small class="text-muted">Opcional: escolha um mês</small>
+                                </div>
+                            </div>
+                            {% endif %}
                             <!-- Conteúdo (comum) -->
                             <div class="col-md-9">
                                 <div class="filtro-group">

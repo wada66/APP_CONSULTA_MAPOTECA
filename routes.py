@@ -138,7 +138,6 @@ def listar():
     editores = models['editor'].query.order_by(models['editor'].nome_editor).all() if 'editor' in models else []
     areas = models['area'].query.order_by(models['area'].nome_area_geografica).all() if 'area' in models else []
 
-    # Verificar se há filtros
     has_filters = any([
         request.args.get('id'),
         request.args.get('n_chamada'),
@@ -146,10 +145,10 @@ def listar():
         request.args.get('autor'),
         request.args.get('local_id'),
         request.args.get('setor_id'),
-        request.args.get('assunto_id'),
         request.args.get('assunto'),
-        request.args.get('mes'),
-        request.args.get('ano'),
+        request.args.get('assunto_id'),
+        request.args.get('mes'),      # Para projen
+        request.args.get('ano'),      # Para todos
         request.args.get('conteudo'),
         request.args.get('executor'),
         request.args.get('editor'),
@@ -194,18 +193,42 @@ def listar():
                     query = query.filter(*condicoes)
                 filtros['titulo'] = termo
 
-        if 'data' in request.args and request.args['data']:
-            try:
-                from datetime import datetime
-                data_str = request.args['data']
-                # Verifica se está no formato correto YYYY-MM-DD
-                data_obj = datetime.strptime(data_str, '%Y-%m-%d').date()
-                query = query.filter(getattr(Principal, field_names['data']) == data_obj)
-                filtros['data'] = data_str
-            except (ValueError, AttributeError):
-                # Se não conseguir converter, ignora o filtro de data
-                pass
+        # Filtro por Ano - com debug completo
+        print(f"\n=== DEBUG ANO ===")
+        print(f"Schema: {schema}")
+        print(f"request.args.get('ano'): {request.args.get('ano')}")
+        print(f"request.args.get('mes'): {request.args.get('mes')}")
 
+        if 'ano' in request.args and request.args['ano']:
+            ano_str = request.args['ano'].strip()
+            print(f"ano_str: '{ano_str}'")
+            print(f"ano_str.isdigit(): {ano_str.isdigit()}")
+            
+            if ano_str.isdigit():
+                ano = int(ano_str)
+                data_field = getattr(Principal, field_names['data'])
+                data_field_name = field_names['data']
+                
+                print(f"Campo data: {data_field_name}")
+                print(f"Ano a filtrar: {ano}")
+                
+                # Aplica o filtro
+                query = query.filter(extract('year', data_field) == ano)
+                filtros['ano'] = ano_str
+                
+                # Se for projen e tiver mês
+                if schema == 'projen' and 'mes' in request.args and request.args['mes']:
+                    mes_str = request.args['mes'].strip()
+                    if mes_str.isdigit():
+                        mes = int(mes_str)
+                        print(f"Mês a filtrar: {mes}")
+                        query = query.filter(extract('month', data_field) == mes)
+                        filtros['mes'] = mes_str
+            else:
+                print(f"Ano inválido (não é dígito): {ano_str}")
+        else:
+            print("Parâmetro 'ano' não encontrado na requisição")
+                            
         if 'conteudo' in request.args and request.args['conteudo']:
             termo = request.args['conteudo'].strip()
             if termo:
