@@ -507,15 +507,30 @@ def listar():
                     filtros['setor_id'] = request.args['setor_id']
                 except: pass
 
-            # Assunto (via tabela de junção)
-            if 'assunto_id' in request.args and request.args['assunto_id']:
-                try:
-                    subq = db.session.query(models['join_assunto'].projar_id).filter(
-                        models['join_assunto'].assunto_id == int(request.args['assunto_id'])
-                    )
-                    query = query.filter(Principal.id_projar.in_(subq))
-                    filtros['assunto_id'] = request.args['assunto_id']
-                except: pass
+            # Assunto - busca textual na tabela de assuntos
+            if 'assunto' in request.args and request.args['assunto']:
+                termo = request.args['assunto'].strip()
+                if termo:
+                    palavras = termo.split()
+                    condicoes = []
+                    for palavra in palavras:
+                        if len(palavra) >= 2:
+                            padrao = criar_padrao_regex(palavra)
+                            try:
+                                condicoes.append(models['assunto'].nome_assunto.op('~*')(padrao))
+                            except:
+                                condicoes.append(models['assunto'].nome_assunto.ilike(f"%{palavra}%"))
+                        else:
+                            condicoes.append(models['assunto'].nome_assunto.ilike(f"%{palavra}%"))
+                    
+                    if condicoes:
+                        # Busca na tabela de assuntos e depois faz join com projar_assunto
+                        subq = db.session.query(models['join_assunto'].projar_id).join(
+                            models['assunto'], models['join_assunto'].assunto_id == models['assunto'].id_assunto
+                        ).filter(*condicoes)
+                        query = query.filter(Principal.id_projar.in_(subq))
+                    filtros['assunto'] = termo
+                    print(f"DEBUG - Filtro assunto projar: {termo}")  # Para debug
 
             # Área geográfica
             if 'area_id' in request.args and request.args['area_id']:
