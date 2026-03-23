@@ -401,7 +401,7 @@
                                         {% set data = item.data_livro if schema=='livros' else item.data_mapa if schema=='mapas' else item.data_projar if schema=='projar' else item.data_projen %}
                                         {% if data %}
                                         <span class="text-muted">
-                                            <i class="fas fa-calendar me-1"></i>{{ data.strftime('%d/%m/%Y') }}
+                                            <i class="fas fa-calendar me-1"></i>{{ data.strftime('%Y') }}
                                         </span>
                                         {% endif %}
                                     </div>
